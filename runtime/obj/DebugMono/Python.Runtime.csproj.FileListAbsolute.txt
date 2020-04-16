@@ -1,0 +1,7 @@
+D:\Mark Diedericks\Downloads\pythonnet-2.4.0\pythonnet-2.4.0\src\runtime\bin\Python.Runtime.xml
+D:\Mark Diedericks\Downloads\pythonnet-2.4.0\pythonnet-2.4.0\src\runtime\bin\Python.Runtime.dll
+D:\Mark Diedericks\Downloads\pythonnet-2.4.0\pythonnet-2.4.0\src\runtime\bin\Python.Runtime.pdb
+D:\Mark Diedericks\Downloads\pythonnet-2.4.0\pythonnet-2.4.0\src\runtime\obj\DebugMono\Python.Runtime.csprojAssemblyReference.cache
+D:\Mark Diedericks\Downloads\pythonnet-2.4.0\pythonnet-2.4.0\src\runtime\obj\DebugMono\Python.Runtime.csproj.CoreCompileInputs.cache
+D:\Mark Diedericks\Downloads\pythonnet-2.4.0\pythonnet-2.4.0\src\runtime\obj\DebugMono\Python.Runtime.dll
+D:\Mark Diedericks\Downloads\pythonnet-2.4.0\pythonnet-2.4.0\src\runtime\obj\DebugMono\Python.Runtime.pdb
