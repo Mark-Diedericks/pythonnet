@@ -15,6 +15,14 @@ namespace Python.Runtime
 
     internal class COMHelper
     {
+        private static Dictionary<Guid, Type> s_Cache;
+
+        static COMHelper()
+        {
+            s_Cache = new Dictionary<Guid, Type>();
+        }
+
+
         internal static Type GetManagedType(object ob, Type t)
         {
             if (ob == null)
@@ -49,10 +57,53 @@ namespace Python.Runtime
         public static Type GetCOMObjectType(ITypeInfo info)
         {
             Guid guid = GetTypeInfoGuid(info);
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
             Type result = null;
 
+            //If we've found it previously, no need to look again
+            #region Check Type Cache
+
+            s_Cache.TryGetValue(guid, out result);
+            if (result != null)
+                return result;
+
+            #endregion
+
+            //Works for most of the cases
+            #region Check AssemblyManager Assemblies
+
+            AssemblyName[] names = AssemblyManager.ListAssemblies();
+            foreach (AssemblyName an in names)
+            {
+                Assembly a = Assembly.Load(an);
+                Type[] aTypes = a.GetTypes();
+                foreach (Type t in aTypes)
+                {
+                    if (t.IsInterface && t.IsImport && t.GUID == guid && !t.Name.StartsWith("_"))
+                    {
+                        result = t;
+
+                        List<Type> possible = aTypes.Where(x => x.Name.Equals(t.Name + "Class", StringComparison.Ordinal)).ToList<Type>();
+                        if (possible.Count > 0)
+                        {
+                            s_Cache.Add(guid, result);
+                            return result;
+                        }
+                    }
+                }
+            }
+
+            if (result != null)
+            {
+                s_Cache.Add(guid, result);
+                return result;
+            }
+
+            #endregion
+            
+            //Extended check of assemblies
+            #region Check CurrentDomain Assemblies
+
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly a in assemblies)
             {
                 Type[] aTypes = a.GetTypes();
@@ -64,15 +115,45 @@ namespace Python.Runtime
 
                         List<Type> possible = aTypes.Where(x => x.Name.Equals(t.Name + "Class", StringComparison.Ordinal)).ToList<Type>();
                         if (possible.Count > 0)
-                            return t;// possible.First<Type>();
+                        {
+                            s_Cache.Add(guid, result);
+                            return result;
+                        }
                     }
                 }
             }
 
             if (result != null)
+            {
+                s_Cache.Add(guid, result);
                 return result;
+            }
 
-            return Type.GetTypeFromCLSID(guid);
+            #endregion
+
+            //Almost never works for my cases but worth a shot i guess
+            #region Check Type CLSID
+
+            result = Type.GetTypeFromCLSID(guid);
+
+            if (result != null)
+            {
+                s_Cache.Add(guid, result);
+                return result;
+            }
+
+            #endregion
+
+            //Reliable but incredibly slow, like really really really slow
+            #region Get Type for ITypeInfo
+
+            IntPtr pInfo = Marshal.GetIUnknownForObject(info);
+            result =  Marshal.GetTypeForITypeInfo(pInfo);
+
+            s_Cache.Add(guid, result);
+            return result;
+
+            #endregion
         }
 
         private static ITypeInfo GetTypeInfo(IDispatch disp)

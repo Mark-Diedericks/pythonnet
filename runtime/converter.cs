@@ -139,25 +139,9 @@ namespace Python.Runtime
 
             Type type = COMHelper.GetManagedType(value, t);
 
-            bool hasIEnumerable = false; // value is IEnumerable
-            bool hasIList = false; //value is IList
-            bool hasINotifyPropertyChanged = false; //(value is INotifyPropertyChanged)
-
-            foreach(Type intf in type.GetInterfaces())
-            {
-                if (intf == typeof(IEnumerable))
-                    hasIEnumerable = true;
-
-                if (intf == typeof(IList))
-                    hasIList = true;
-
-                if (intf == typeof(INotifyPropertyChanged))
-                    hasINotifyPropertyChanged = true;
-            }
-
             #endregion
 
-            if (hasIList && !hasINotifyPropertyChanged && type.IsGenericType)
+            if (value is IList && !(value is INotifyPropertyChanged) && type.IsGenericType)
 			{
                 using (var resultlist = new PyList())
                 {
@@ -251,7 +235,7 @@ namespace Python.Runtime
                     return Runtime.PyLong_FromUnsignedLongLong((ulong)value);
 
                 default:
-                    if (hasIEnumerable)
+                    if (value is IEnumerable)
                     {
                         using (var resultlist = new PyList())
                         {
