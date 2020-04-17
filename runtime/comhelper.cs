@@ -74,22 +74,26 @@ namespace Python.Runtime
             AssemblyName[] names = AssemblyManager.ListAssemblies();
             foreach (AssemblyName an in names)
             {
-                Assembly a = Assembly.Load(an);
-                Type[] aTypes = a.GetTypes();
-                foreach (Type t in aTypes)
+                try
                 {
-                    if (t.IsInterface && t.IsImport && t.GUID == guid && !t.Name.StartsWith("_"))
+                    Assembly a = Assembly.Load(an);
+                    Type[] aTypes = a.GetTypes();
+                    foreach (Type t in aTypes)
                     {
-                        result = t;
-
-                        List<Type> possible = aTypes.Where(x => x.Name.Equals(t.Name + "Class", StringComparison.Ordinal)).ToList<Type>();
-                        if (possible.Count > 0)
+                        if (t.IsInterface && t.IsImport && t.GUID == guid && !t.Name.StartsWith("_"))
                         {
-                            s_Cache.Add(guid, result);
-                            return result;
+                            result = t;
+
+                            List<Type> possible = aTypes.Where(x => x.Name.Equals(t.Name + "Class", StringComparison.Ordinal)).ToList<Type>();
+                            if (possible.Count > 0)
+                            {
+                                s_Cache.Add(guid, result);
+                                return result;
+                            }
                         }
                     }
                 }
+                catch (Exception ex) { }
             }
 
             if (result != null)
