@@ -1,4 +1,4 @@
-# pythonnet
+# pythonnet 2.4.0 w/ basic COM
 Custom build of pythonnet 2.4.0 - Usage of COM types through managed wrappers.
 Original project at http://pythonnet.github.io  and  https://github.com/pythonnet/pythonnet
 
