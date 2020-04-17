@@ -4,3 +4,9 @@ D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\Office Python\Dependenc
 D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\Office Python\Dependencies\pythonnet-2.4.0\runtime\obj\x64\DebugWinPY3\Python.Runtime.csproj.CoreCompileInputs.cache
 D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\Office Python\Dependencies\pythonnet-2.4.0\runtime\obj\x64\DebugWinPY3\Python.Runtime.dll
 D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\Office Python\Dependencies\pythonnet-2.4.0\runtime\obj\x64\DebugWinPY3\Python.Runtime.pdb
+D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\bin\x64\DebugWinPY3\Python.Runtime.dll
+D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\bin\x64\DebugWinPY3\Python.Runtime.pdb
+D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\bin\x64\DebugWinPY3\Python.Runtime.xml
+D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\obj\x64\DebugWinPY3\Python.Runtime.csproj.CoreCompileInputs.cache
+D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\obj\x64\DebugWinPY3\Python.Runtime.dll
+D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\obj\x64\DebugWinPY3\Python.Runtime.pdb

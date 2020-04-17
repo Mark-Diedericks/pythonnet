@@ -4,12 +4,6 @@
         <name>Python.Runtime</name>
     </assembly>
     <members>
-        <member name="T:Python.Runtime.DispatchUtility">
-            <summary>
-            Authored by Bill Menees
-            https://stackoverflow.com/a/14208030/8520655
-            </summary>
-        </member>
         <member name="T:Python.Runtime.ArrayObject">
             <summary>
             Implements a Python type for managed arrays. This type is essentially

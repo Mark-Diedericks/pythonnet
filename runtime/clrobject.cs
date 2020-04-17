@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.CustomMarshalers;
 
 namespace Python.Runtime
 {
@@ -58,14 +57,11 @@ namespace Python.Runtime
         }
 
 
-        internal static IntPtr GetInstHandle(object ob, Type t)
+        internal static IntPtr GetInstHandle(object ob, Type type)
         {
-            return COMHelper.GetInstHandle(ob, t);
-
-            /*Type type = COMHelper.GetManagedType(ob, t);
-            ClassBase cc = ClassManager.GetClass(type);
+            ClassBase cc = ClassManager.GetClass(type);            
             CLRObject co = GetInstance(ob, cc.tpHandle);
-            return co.pyHandle;*/
+            return co.pyHandle;
         }
 
 

@@ -1,6 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 
 namespace Python.Runtime
 {
@@ -291,6 +295,12 @@ namespace Python.Runtime
                 _methods = GetMethods();
             }
 
+            #region COM Binding
+
+            List<Binding> bindings = new List<Binding>();
+
+            #endregion
+
             // TODO: Clean up
             foreach (MethodBase mi in _methods)
             {
@@ -334,8 +344,27 @@ namespace Python.Runtime
                     target = co.inst;
                 }
 
-                return new Binding(mi, target, margs, outs);
+                #region COM Binding
+
+                bindings.Add(new Binding(mi, target, margs, outs));
+                //return new Binding(mi, target, margs, outs);
+
+                #endregion
             }
+
+            #region COM Binding
+
+            if (bindings.Count > 0)
+            {
+                Binding def = bindings.Where<Binding>(x => x.info.Name.EndsWith("_Default")).FirstOrDefault<Binding>();
+                if (def != null)
+                    return def;
+
+                return bindings.First<Binding>();
+            }
+
+            #endregion
+
             // We weren't able to find a matching method but at least one
             // is a generic method and info is null. That happens when a generic
             // method was not called using the [] syntax. Let's introspect the

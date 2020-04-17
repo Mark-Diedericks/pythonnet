@@ -169,7 +169,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CustomMarshalers" />
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +260,9 @@
   <PropertyGroup>
     <TargetAssembly>$(TargetPath)</TargetAssembly>
     <TargetAssemblyPdb>$(TargetDir)$(TargetName).pdb</TargetAssemblyPdb>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetDir)*" "$(SolutionDir)\bin\" /s /Y</PostBuildEvent>
   </PropertyGroup>
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(TargetAssembly)" DestinationFolder="$(PythonBuildDir)" />

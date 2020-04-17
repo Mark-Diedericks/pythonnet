@@ -116,7 +116,7 @@ namespace Python.Runtime
             return ToPython(value, typeof(T));
         }
 
-        internal static IntPtr ToPython(object value, Type type)
+        internal static IntPtr ToPython(object value, Type t)
         {
             if (value is PyObject)
             {
@@ -135,7 +135,29 @@ namespace Python.Runtime
                 return result;
             }
 
-			if (value is IList && !(value is INotifyPropertyChanged) && value.GetType().IsGenericType)
+            #region COM Binding
+
+            Type type = COMHelper.GetManagedType(value, t);
+
+            bool hasIEnumerable = false; // value is IEnumerable
+            bool hasIList = false; //value is IList
+            bool hasINotifyPropertyChanged = false; //(value is INotifyPropertyChanged)
+
+            foreach(Type intf in type.GetInterfaces())
+            {
+                if (intf == typeof(IEnumerable))
+                    hasIEnumerable = true;
+
+                if (intf == typeof(IList))
+                    hasIList = true;
+
+                if (intf == typeof(INotifyPropertyChanged))
+                    hasINotifyPropertyChanged = true;
+            }
+
+            #endregion
+
+            if (hasIList && !hasINotifyPropertyChanged && type.IsGenericType)
 			{
                 using (var resultlist = new PyList())
                 {
@@ -170,8 +192,6 @@ namespace Python.Runtime
             // hmm - from Python, we almost never care what the declared
             // type is. we'd rather have the object bound to the actual
             // implementing class.
-
-            type = value.GetType();
 
             TypeCode tc = Type.GetTypeCode(type);
 
@@ -231,7 +251,7 @@ namespace Python.Runtime
                     return Runtime.PyLong_FromUnsignedLongLong((ulong)value);
 
                 default:
-                    if (value is IEnumerable)
+                    if (hasIEnumerable)
                     {
                         using (var resultlist = new PyList())
                         {
