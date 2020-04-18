@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2020 Mark Diedericks
+Copyright (c) 2006-2020 the contributors of the "Python for .NET" project, Mark Diedericks
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
