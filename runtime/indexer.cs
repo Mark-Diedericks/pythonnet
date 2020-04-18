@@ -43,10 +43,12 @@ namespace Python.Runtime
             }
         }
 
-        internal IntPtr GetItem(IntPtr inst, IntPtr args)
+        #region COM Binding
+        internal IntPtr GetItem(IntPtr inst, IntPtr args, Type type)
         {
-            return GetterBinder.Invoke(inst, args, IntPtr.Zero);
+            return GetterBinder.Invoke(inst, args, IntPtr.Zero, type);
         }
+        #endregion
 
 
         internal void SetItem(IntPtr inst, IntPtr args)

@@ -10,4 +10,3 @@ D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\bin\x
 D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\obj\x64\DebugWinPY3\Python.Runtime.csproj.CoreCompileInputs.cache
 D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\obj\x64\DebugWinPY3\Python.Runtime.dll
 D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\obj\x64\DebugWinPY3\Python.Runtime.pdb
-D:\Mark Diedericks\Documents\Visual Studio 2019\Projects\pythonnet\runtime\obj\x64\DebugWinPY3\Python.Runtime.csprojAssemblyReference.cache

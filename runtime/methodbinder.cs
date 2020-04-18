@@ -269,18 +269,26 @@ namespace Python.Runtime
         /// overload and return a structure that contains the converted Python
         /// instance, converted arguments and the correct method to call.
         /// </summary>
-        internal Binding Bind(IntPtr inst, IntPtr args, IntPtr kw)
+        internal List<Binding> Bind(IntPtr inst, IntPtr args, IntPtr kw)
         {
-            return Bind(inst, args, kw, null, null);
+            return Bind(inst, args, kw, null, null, null);
         }
 
-        internal Binding Bind(IntPtr inst, IntPtr args, IntPtr kw, MethodBase info)
+        internal List<Binding> Bind(IntPtr inst, IntPtr args, IntPtr kw, MethodBase info)
         {
-            return Bind(inst, args, kw, info, null);
+            return Bind(inst, args, kw, null, info, null);
         }
 
-        internal Binding Bind(IntPtr inst, IntPtr args, IntPtr kw, MethodBase info, MethodInfo[] methodinfo)
+        internal List<Binding> Bind(IntPtr inst, IntPtr args, IntPtr kw, Type type, MethodBase info, MethodInfo[] methodinfo)
         {
+
+            #region COM Binding
+
+            List<Binding> bindings = new List<Binding>();
+
+            #endregion
+
+
             // loop to find match, return invoker w/ or /wo error
             MethodBase[] _methods = null;
             var pynargs = (int)Runtime.PyTuple_Size(args);
@@ -295,15 +303,23 @@ namespace Python.Runtime
                 _methods = GetMethods();
             }
 
-            #region COM Binding
-
-            List<Binding> bindings = new List<Binding>();
-
-            #endregion
-
             // TODO: Clean up
             foreach (MethodBase mi in _methods)
             {
+                #region COM Binding
+
+                try
+                {
+                    // Enforcable return types
+                    if (type != null)
+                        if(!(type.IsSubclassOf(((MethodInfo)mi).ReturnType) 
+                            || type.Equals(((MethodInfo)mi).ReturnType)))
+                            continue;
+                }
+                catch (InvalidCastException ex) { }
+
+                #endregion
+
                 if (mi.IsGenericMethod)
                 {
                     isGeneric = true;
@@ -339,7 +355,7 @@ namespace Python.Runtime
                     // XXX maybe better to do this before all the other rigmarole.
                     if (co == null)
                     {
-                        return null;
+                        return new List<Binding>();
                     }
                     target = co.inst;
                 }
@@ -356,11 +372,17 @@ namespace Python.Runtime
 
             if (bindings.Count > 0)
             {
+                /*Binding item = bindings.Where<Binding>(x => x.info.Name.EndsWith("_Item")).FirstOrDefault<Binding>();
+                if (item != null)
+                    return item;
+
                 Binding def = bindings.Where<Binding>(x => x.info.Name.EndsWith("_Default")).FirstOrDefault<Binding>();
                 if (def != null)
                     return def;
 
-                return bindings.First<Binding>();
+                return bindings.First<Binding>();*/
+
+                return bindings.OrderBy(x => x.info.Name).ToList<Binding>();
             }
 
             #endregion
@@ -373,9 +395,9 @@ namespace Python.Runtime
             {
                 Type[] types = Runtime.PythonArgsToTypeArray(args, true);
                 MethodInfo mi = MatchParameters(methodinfo, types);
-                return Bind(inst, args, kw, mi, null);
+                return Bind(inst, args, kw, type, mi, null);
             }
-            return null;
+            return new List<Binding>();
         }
 
         /// <summary>
@@ -568,21 +590,31 @@ namespace Python.Runtime
 
         internal virtual IntPtr Invoke(IntPtr inst, IntPtr args, IntPtr kw)
         {
-            return Invoke(inst, args, kw, null, null);
+            return Invoke(inst, args, kw, null, null, null);
+        }
+
+        internal virtual IntPtr Invoke(IntPtr inst, IntPtr args, IntPtr kw, Type tp)
+        {
+            return Invoke(inst, args, kw, tp, null, null);
         }
 
         internal virtual IntPtr Invoke(IntPtr inst, IntPtr args, IntPtr kw, MethodBase info)
         {
-            return Invoke(inst, args, kw, info, null);
+            return Invoke(inst, args, kw, null, info, null);
         }
 
         internal virtual IntPtr Invoke(IntPtr inst, IntPtr args, IntPtr kw, MethodBase info, MethodInfo[] methodinfo)
         {
-            Binding binding = Bind(inst, args, kw, info, methodinfo);
-            object result;
+            return Invoke(inst, args, kw, null, info, methodinfo);
+        }
+
+        internal virtual IntPtr Invoke(IntPtr inst, IntPtr args, IntPtr kw, Type type, MethodBase info, MethodInfo[] methodinfo)
+        {
+            List<Binding> bindings = Bind(inst, args, kw, type, info, methodinfo);
+            object result = null;
             IntPtr ts = IntPtr.Zero;
 
-            if (binding == null)
+            if (bindings.Count == 0)
             {
                 var value = "No method matches given arguments";
                 if (methodinfo != null && methodinfo.Length > 0)
@@ -598,23 +630,51 @@ namespace Python.Runtime
                 ts = PythonEngine.BeginAllowThreads();
             }
 
-            try
+            #region COM Binding
+
+            Binding binding = null;
+            Exception ex = new Exception();
+
+            foreach (Binding bind in bindings)
             {
-                result = binding.info.Invoke(binding.inst, BindingFlags.Default, null, binding.args, null);
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException != null)
+                if (binding != null)
+                    break;
+
+                try
                 {
-                    e = e.InnerException;
+                    result = bind.info.Invoke(bind.inst, BindingFlags.Default, null, bind.args, null);
+                    binding = bind;
+                }
+                catch(TargetInvocationException e)
+                {
+                    System.Diagnostics.Debug.WriteLine("TargetInvocationException: " + bind.info.Name + " with " + bind.args.Length + " arguments.");
+                    binding = null;
+                    ex = e;
+                }
+                catch (Exception e)
+                {
+                    binding = null;
+                    ex = e;
+                }
+            }
+
+
+            if (binding == null)
+            {
+                if (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
                 }
                 if (allow_threads)
                 {
                     PythonEngine.EndAllowThreads(ts);
                 }
-                Exceptions.SetError(e);
+                Exceptions.SetError(ex);
+
                 return IntPtr.Zero;
             }
+
+            #endregion
 
             if (allow_threads)
             {

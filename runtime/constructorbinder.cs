@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Python.Runtime
@@ -76,7 +77,9 @@ namespace Python.Runtime
                 return result;
             }
 
-            Binding binding = Bind(inst, args, kw, info);
+            #region COM Binding
+            Binding binding = Bind(inst, args, kw, info).First<Binding>();
+            #endregion
 
             if (binding == null)
             {
@@ -88,7 +91,9 @@ namespace Python.Runtime
                 // any extra args are intended for the subclass' __init__.
 
                 IntPtr eargs = Runtime.PyTuple_New(0);
-                binding = Bind(inst, eargs, kw);
+                #region COM Binding
+                binding = Bind(inst, eargs, kw).First<Binding>();
+                #endregion
                 Runtime.XDecref(eargs);
 
                 if (binding == null)

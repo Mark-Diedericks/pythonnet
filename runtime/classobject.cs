@@ -187,7 +187,9 @@ namespace Python.Runtime
 
             try
             {
-                value = cls.indexer.GetItem(ob, args);
+                #region COM Binding
+                value = cls.indexer.GetItem(ob, args, cls.type);
+                #endregion
             }
             finally
             {
