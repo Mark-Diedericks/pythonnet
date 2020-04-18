@@ -6,6 +6,8 @@ Very basic changes to original code to allow for embedded PythonNET to use ComOb
 
 Code will simply attempt to find the managed type which represents the given ComObject and use that to define functionality.
 
-Additionally, InterfaceObjects are now indexable as that did not exist in the original PythonNet project.
+Additionally: 
+    - InterfaceObjects are now indexable as that did not exist in the original PythonNet project.
+    - InterfaceObjects and ClassObjects now enforce a ReturnType for their indexing (improves support of Excel PIA)
 
 In my case this was needed for the Microsoft.Office.Interop.Excel.Range Com Interface, as it is enumerable.
